@@ -6,6 +6,7 @@
 
   (import (scheme base))
   (import (srfi 4))
+  (import (srfi 69))
 
   (begin
     (define-record-type
@@ -25,7 +26,7 @@
       segment-indexes)
 
     (define *glyph-tbl*
-      (list->table
+      (alist->hash-table
         `((#\0 . 0) (#\1 . 1) (#\2 . 2) (#\3 . 3) (#\4 . 4)
           (#\5 . 5) (#\6 . 6) (#\7 . 7) (#\8 . 8) (#\9 . 9)
           (#\: . 10) (#\space . 11))))
@@ -73,7 +74,7 @@
             (make-funny-font-glyph 1 #())))))
 
     (define (char->glyph-index chr)
-      (table-ref *glyph-tbl* chr #f))
+      (hash-table-ref/default *glyph-tbl* chr #f))
 
     (define (render-glyph font glyph-index scale x y w h)
       (and (< glyph-index (vector-length (funny-font-glyphs font)))
