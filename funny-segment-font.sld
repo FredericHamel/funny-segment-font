@@ -2,7 +2,8 @@
 (define-library (funny-segment-font)
 
   (export gen-funny-font
-          render-glyph)
+          render-glyph
+          char->glyph-index)
 
   (import (scheme base))
   (import (srfi 4))
@@ -13,6 +14,9 @@
       funny-font
       make-funny-font
       funny-font?
+
+      segment-width
+      segment-height
 
       segments
       glyphs)
@@ -55,6 +59,7 @@
       (let ((segments (gen-segments width height pad))
             (digit-width (+ width pad pad pad)))
         (make-funny-font
+          width height
           segments
           (vector
             ;; digits
@@ -70,15 +75,17 @@
             (make-funny-font-glyph digit-width #(0 1 2 3 5 6))
 
             ;; Colon and Space
-            (make-funny-font-glyph 1 #(7 8))
-            (make-funny-font-glyph 1 #())))))
+            (make-funny-font-glyph digit-width #(7 8))
+            (make-funny-font-glyph digit-width #())))))
 
     (define (char->glyph-index chr)
       (hash-table-ref/default *glyph-tbl* chr #f))
 
-    (define (render-glyph font glyph-index scale x y w h)
+    (define (render-glyph font glyph-index scale x y)
       (and (< glyph-index (vector-length (funny-font-glyphs font)))
            (let ((glyph (vector-ref (funny-font-glyphs font) glyph-index))
+                 (seg-w (funny-font-segment-width font))
+                 (seg-h (funny-font-segment-height font))
                  (segments (funny-font-segments font)))
              (values (vector-map
                        (lambda (segment-index)
@@ -89,11 +96,11 @@
 
                                 ;; rectangle components
                                 (s-x (* scale (+ x seg-x)))
-                                (s-y (* scale (+ x seg-y)))
+                                (s-y (* scale (+ y seg-y)))
                                 (s-w (if (eq? seg-type 'hori)
-                                         (* scale w) scale))
+                                         (* scale seg-w) scale))
                                 (s-h (if (eq? seg-type 'vert)
-                                         (* scale h) scale)))
+                                         (* scale seg-h) scale)))
                            (s32vector s-x s-y s-w s-h)))
                        (funny-font-glyph-segment-indexes glyph))
                      ;; width as second value
