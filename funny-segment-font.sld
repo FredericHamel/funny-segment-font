@@ -5,15 +5,18 @@
           render-glyph
           char->glyph-index)
 
-  (import (scheme base))
-  (import (srfi 4))
+  ;;; define-type :(
+  (import (gambit))
+
+  ;(import (scheme base))
+  ;(import (srfi 4))
   (import (srfi 69))
 
   (begin
-    (define-record-type
-      funny-font
-      make-funny-font
-      funny-font?
+    (define-type funny-font
+      id: 442A11B8-3075-4179-BA88-BD2D246F8B53
+      constructor: make-funny-font
+      predicate: funny-font?
 
       segment-width
       segment-height
@@ -21,10 +24,10 @@
       segments
       glyphs)
 
-    (define-record-type
-      funny-font-glyph
-      make-funny-font-glyph
-      funny-font-glyph?
+    (define-type funny-font-glyph
+      id: 15126FDA-E549-4439-ACA0-325097968270
+      constructor: make-funny-font-glyph
+      predicate: funny-font-glyph?
 
       width
       segment-indexes)
